@@ -10,3 +10,6 @@
 [submodule "modules/openssh"]
 	path = modules/openssh
 	url = git://github.com/ChoHag/atwan-puppet-openssh.git
+[submodule "modules/apt"]
+	path = modules/apt
+	url = git://github.com/ChoHag/atwan-puppet-apt.git
