@@ -1,0 +1,14 @@
+parameters:
+  apt_sources:
+    system:
+      file: /etc/apt/sources.list
+      url:  http://ftp.uk.debian.org/debian/
+      repositories:
+        - wheezy
+        - wheezy-backports
+    puppetlabs:
+      url:   http://apt.puppetlabs.com/
+      suite: wheezy
+      repositories:
+        Puppetlabs products:
+        Puppetlabs dependencies: dependencies

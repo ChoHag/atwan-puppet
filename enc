@@ -1,0 +1,61 @@
+#!/bin/bash
+set -e
+
+# This is rubbish. Don't use it.
+
+node=${1%.yaml}
+encdb=${PUPPET_ENCDB:-/etc/atwan/enc.db}
+
+parse_common() {
+  to=$1
+  local common
+  while IFS=$'\n' read line; do
+    if [[ $line =~ ^$to:$ ]]; then
+      continue
+    fi
+    common="${common:+$common$'\n'}$line"
+  done
+  eval $to=\"\$common\"
+}
+
+unset parameters
+if [ -e "$encdb"/COMMON-PARAMETERS ]; then
+  parse_common parameters <"$encdb"/COMMON-PARAMETERS
+fi
+
+unset classes
+if [ -e "$encdb"/COMMON-CLASSES ]; then
+  parse_common classes <"$encdb"/COMMON-CLASSES
+fi
+
+if [ -d "$encdb" ]; then
+  if [ -e "$encdb/$node.yaml" ]; then
+    yaml="$encdb/$node.yaml"
+  elif [ -e "$encdb/${node%%.*}.yaml" ]; then
+    yaml="$encdb/${node%%.*}.yaml"
+  fi
+fi
+
+if [[ ! -v yaml ]]; then
+  echo Node $node not found in $encdb. >&2
+  exit 1
+fi
+
+unset done_parameters done_classes
+while IFS=$'\n' read line; do
+  if [[ $line =~ ^(parameters|classes):$ ]]; then
+    echo "$line"
+    eval echo \"\$${BASH_REMATCH[1]}\"
+    eval done_${BASH_REMATCH[1]}=1
+  else
+    echo "$line"
+  fi
+done < "$yaml"
+
+for common in parameters classes; do
+  if [[ ! -v done_$common ]]; then
+    echo $common:
+    eval echo \"\$$common\"
+  fi
+done
+

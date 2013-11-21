@@ -1,0 +1,14 @@
+parameters:
+  with_puppet: false
+  install_packages_extra:
+    - rsync
+    - git
+classes:
+  puppet:
+    manifestdir: /etc/atwan/manifests
+    modulepath: /etc/atwan/modules:/etc/puppet/modules:/usr/share/puppet/modules
+    node_terminus: exec
+    external_nodes: /etc/atwan/enc
+  puppet::master:
+  openssh::server:
+    config_PermitRootLogin: 'yes'
